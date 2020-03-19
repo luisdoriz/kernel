@@ -33,7 +33,7 @@ const CpuView = () => {
                           <h4>Nombre: {process.name}</h4>
                           <h4>Tpo llegada: {process.entryTime}</h4>
                           <h4>Cpu asignado: {process.assignedCpu}</h4>
-                          <h4>Envejecimiento: {actualTime - process.entryTime - process.assignedCpu}</h4>
+                          <h4>Envejecimiento: {((actualTime - process.entryTime - process.assignedCpu + process.remainingCpu)/process.remainingCpu)}</h4>
                           <h4>Cpu restante: {process.remainingCpu}</h4>
                           {schedueling === scheduelings.RR && <h4>Quantum Restante: {quantum}</h4>}
                         </>

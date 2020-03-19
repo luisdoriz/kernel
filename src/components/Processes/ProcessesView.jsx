@@ -21,7 +21,7 @@ const ProcessesView = () => {
           schedueling,
           setProcesses,
         }) => {
-          const columns = [ 'ready', 'running', 'blocked', 'finished' ];
+          const columns = ['ready', 'running', 'blocked', 'finished'];
           const cols = {
             ready: sort[schedueling](processes, actualTime),
             running: processes.filter(process => process.status === 1),
@@ -45,14 +45,14 @@ const ProcessesView = () => {
               newProcess.status = 1;
             } else if (schedueling === scheduelings.SRT
               && cols.running[0].remainingCpu > newProcess.remainingCpu) {
-                newProcesses[cols.running[0].name-1].status = 3
-                newProcess.status = 1;
+              newProcesses[cols.running[0].name - 1].status = 3
+              newProcess.status = 1;
             } else if (schedueling === scheduelings.SRT
-              && (actualTime - cols.running[0].entryTime - cols.running[0].assignedCpu)
-              < (actualTime - newProcess.entryTime - newProcess.assignedCpu)) {
-                newProcesses[cols.running[0].name-1].status = 3
-                newProcess.status = 1;
-              }
+              && ((actualTime - cols.running[0].entryTime - cols.running[0].assignedCpu + cols.running[0].remainingCpu) / cols.running[0].remainingCpu)
+              < ((actualTime - newProcess.entryTime - newProcess.assignedCpu + newProcess.remainingCpu)/newProcess.remainingCpu)) {
+              newProcesses[cols.running[0].name - 1].status = 3
+              newProcess.status = 1;
+            }
             newProcesses.push(newProcess);
             setProcesses(newProcesses);
           };
