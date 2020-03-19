@@ -12,7 +12,7 @@ const CpuView = () => {
     <Context.Consumer>
       {
         ({
-          running,
+          processes,
           actualTime,
           quantum,
           setOriginalQuantum,
@@ -20,7 +20,7 @@ const CpuView = () => {
           schedueling,
           setSchedueling,
         }) => {
-          const process = running[0];
+          const process = processes.filter(process => process.status === 1)[0];
           return (
             <Row type="flex" style={{ marginTop: 20 }} justify="center" align="middle">
               <Col span={22} className="core-container" >

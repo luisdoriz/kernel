@@ -1,30 +1,29 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import Context from '../../../Context';
 import Upload from '../../Upload';
 import Processes from '../../Processes';
 import Cpu from '../../Cpu';
 import Header from '../../Header';
+import Memory from '../../Memory';
 
-const CoreView = () => (
-  <Context.Consumer>
-    {
-      ({ processes }) => {
-        if (!processes.length) {
-          return (
-            <Upload />
-          )
-        }
-        return (
-          <>
-            <Header />
-            <Processes />
-            <Cpu />
-          </>
-        );
-      }
-    }
-  </Context.Consumer>
-);
-
+const CoreView = () => {
+  const { processes } = useContext(Context.Consumer)
+  if (!processes.length) {
+    return (
+      <Upload />
+    )
+  }
+  console.log(processes)
+  return (
+    <div style={{ padding: 50 }}>
+      <div className="header" >
+        <Header />
+      </div>
+      <Processes />
+      <Cpu />
+      <Memory />
+    </div>
+  );
+}
 export default CoreView;

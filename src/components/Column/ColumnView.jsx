@@ -4,6 +4,7 @@ import { Col } from 'antd';
 import './styles.css'
 
 const ColumnView = ({ name, list, span, height, children }) => {
+  
   return (
     <Col className="column" span={span} style={{ height: height + 62 }} >
       <div className={`column-header column-header-${name}`}><h1>{name}</h1></div>

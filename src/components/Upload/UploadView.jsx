@@ -7,7 +7,7 @@ import Context from '../../Context';
 const FileInput = () => (
   <Context.Consumer>
     {
-      ({ setColumns, setPageNumber, setActualTime, setProcessesCount, quantum }) => {
+      ({ setProcesses, setPageNumber, setActualTime, setProcessesCount, quantum }) => {
         const setFields = ({ pageNumber, actualTime, processesCount }) => {
           setPageNumber(pageNumber);
           setActualTime(actualTime);
@@ -27,15 +27,28 @@ const FileInput = () => (
             process.remainingQuantum = quantum;
             process.pageNumber = Number(secondRow);
             process.entryTime = Number(firstRow[0]);
+            process.entryTimeReady = Number(firstRow[0]);
+            process.entryTimeBlocked = Number(firstRow[0]);
             process.remainingCpu = Number(firstRow[1]);
             process.status = Number(firstRow[2]);
+            process.pages = [];
             for (let i = 0; i < secondRow; i++) {
-              rows.shift();
+              const page = rows.shift().split(',');
+              let newPage = {};
+              newPage.pageNumber = i;
+              newPage.residence = Number(page[0]);
+              newPage.entry = Number(page[1]);
+              newPage.lastAccess = Number(page[2]);
+              newPage.access = Number(page[3]);
+              newPage.read = Number(page[4]);
+              newPage.write = Number(page[5]);
+              newPage.nur = `${newPage.read}${newPage.write}`;
+              process.pages.push(newPage);
             }
             processes.push(process);
             process = {};
           }
-          setColumns(processes);
+          setProcesses(processes);
           notification.success({
             message: '¡Listo!',
             description: 'Se ha procesado con exito.',
