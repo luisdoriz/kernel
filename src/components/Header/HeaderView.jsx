@@ -133,8 +133,17 @@ const CpuView = () => {
     running.pages[page].residence = 1;
     running.pages[page].lastAccess = actualTime;
     running.pages[page].access = running.pages[page].access + 1;
-    running.pages[page].read = 1;
-    running.pages[page].nur = `${running.pages[page].read}${running.pages[page].write}`;
+    if (1 + running.pages[page].count === 5) {
+      running.pages[page].count = 0;
+      running.pages[page].read = 1;
+      running.pages[page].write= 1
+      running.pages[page].nur = `${running.pages[page].read}${running.pages[page].write}`;
+
+    } else {
+      running.pages[page].count = 1 + running.pages[page].count;
+      running.pages[page].read = 1;
+      running.pages[page].nur = `${running.pages[page].read}${running.pages[page].write}`;
+    }
     newProcesses[running.name - 1] = running;
     setProcesses(newProcesses);
 

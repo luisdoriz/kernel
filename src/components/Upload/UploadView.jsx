@@ -36,6 +36,7 @@ const FileInput = () => (
               const page = rows.shift().split(',');
               let newPage = {};
               newPage.pageNumber = i;
+              newPage.count = 0;
               newPage.residence = Number(page[0]);
               newPage.entry = Number(page[1]);
               newPage.lastAccess = Number(page[2]);
