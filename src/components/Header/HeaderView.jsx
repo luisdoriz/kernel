@@ -54,6 +54,7 @@ const CpuView = () => {
         } else {
           setQuantum(quantum - 1);
           newProcesses[running.name - 1].remainingCpu = running.remainingCpu - 1;
+          newProcesses[running.name - 1].assignedCpu = running.assignedCpu + 1;
         }
         if (running.remainingCpu === 0) {
           setPageNumber(0);
@@ -66,6 +67,7 @@ const CpuView = () => {
       } else {
         setPageNumber(0);
         newProcesses[running.name - 1].remainingCpu = running.remainingCpu - 1;
+        newProcesses[running.name - 1].assignedCpu = running.assignedCpu + 1;
         if (running.remainingCpu === 0) {
           newProcesses[running.name - 1].status = 4;
           if (nextRunning) {

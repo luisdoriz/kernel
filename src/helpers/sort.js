@@ -16,7 +16,7 @@ const sort = {
     return orderedProcesses.sort((a, b) => {
       b.aging = actualTime - b.entryTime - b.assignedCpu;
           a.aging = actualTime - a.entryTime - a.assignedCpu;
-          return ((b.aging+b.remainingCpu)/b.remainingCpu) - ((a.aging+a.remainingCpu)/a.remainingCpu);
+          return ((b.aging+(b.remainingCpu + b.assignedCpu))/(b.remainingCpu + b.assignedCpu)) - ((a.aging+(a.remainingCpu + a.assignedCpu))/(a.remainingCpu + a.assignedCpu));
     })
   },
   block: (processes) => {
