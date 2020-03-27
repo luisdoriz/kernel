@@ -13,6 +13,8 @@ const MemoryView = () => {
     memoryAlgorithm,
     setMemoryAlgorithm,
     setProcesses,
+    setActualTime,
+    actualTime,
   } = useContext(Context.Consumer)
   const columns = [
     {
@@ -51,11 +53,12 @@ const MemoryView = () => {
   const resetBits = () => {
     const newProcesses = [...processes];
     newProcesses[running.name -1].pages = running.pages.map((page) => {
-      page.write = 1;
+      page.write = 0;
       page.read = 0;
-      page.nur = '10';
+      page.nur = '00';
       return page;
     })
+    setActualTime(actualTime +1);
     setProcesses(newProcesses);
   }
   return (

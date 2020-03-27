@@ -17,6 +17,7 @@ const ProcessesView = () => {
         ({
           processes,
           actualTime,
+          setActualTime,
           quantum,
           schedueling,
           setProcesses,
@@ -49,11 +50,12 @@ const ProcessesView = () => {
               newProcess.status = 1;
             } else if (schedueling === scheduelings.SRT
               && ((actualTime - cols.running[0].entryTime - cols.running[0].assignedCpu + cols.running[0].remainingCpu) / cols.running[0].remainingCpu)
-              < ((actualTime - newProcess.entryTime - newProcess.assignedCpu + newProcess.remainingCpu)/newProcess.remainingCpu)) {
+              < ((actualTime - newProcess.entryTime - newProcess.assignedCpu + newProcess.remainingCpu) / newProcess.remainingCpu)) {
               newProcesses[cols.running[0].name - 1].status = 3
               newProcess.status = 1;
             }
             newProcesses.push(newProcess);
+            setActualTime(actualTime + 1);
             setProcesses(newProcesses);
           };
           const submitForm = () => {

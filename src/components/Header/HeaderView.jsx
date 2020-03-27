@@ -22,12 +22,23 @@ const CpuView = () => {
     schedueling,
     memoryAlgorithm,
     pageNumber,
+    blockCounter,
+    setBlockCounter,
   } = useContext(Context.Consumer)
   const [interruption, setInterruption] = useState(undefined)
 
   const executeInstruction = (newProcesses) => {
     const running = newProcesses.filter(process => process.status === 1)[0];
     const nextRunning = sort[schedueling](newProcesses, actualTime)[0];
+    if (blockCounter + 1 === 5) {
+      const blocked = newProcesses.filter(process => process.status === 2)[0];
+      if (blocked.length > 0) {
+        newProcesses[blocked[0].name - 1].status = 3;
+      }
+      setBlockCounter(0)
+    } else {
+      setBlockCounter(blockCounter + 1)
+    }
     if (running) {
       if (schedueling === scheduelings.RR) {
         if (quantum - 1 === 0 && running.remainingCpu - 1 !== 0) {
@@ -109,15 +120,13 @@ const CpuView = () => {
       }
     });
     if (pageNumber === activePages) {
+      let newPage;
       if (memoryAlgorithms.FIFO === memoryAlgorithm) {
-        const newPage = running.pages.sort((a, b) => a.entry - b.entry)[0];
-        running.pages[newPage.pageNumber].residence = 0;
+        newPage = running.pages.sort((a, b) => a.entry - b.entry)[0];
       } else if (memoryAlgorithms.LRU === memoryAlgorithm) {
-        const newPage = running.pages.sort((a, b) => a.lastAccess - b.lastAccess)[0];
-        running.pages[newPage.pageNumber].residence = 0;
+        newPage = running.pages.sort((a, b) => a.lastAccess - b.lastAccess)[0];
       } else if (memoryAlgorithms.LFU === memoryAlgorithm) {
-        const newPage = running.pages.sort((a, b) => a.access - b.access)[0];
-        running.pages[newPage.pageNumber].residence = 0;
+        newPage = running.pages.sort((a, b) => a.access - b.access)[0];
       } else if (memoryAlgorithms.NUR === memoryAlgorithm) {
         const criteria = {
           '00': 1,
@@ -125,18 +134,27 @@ const CpuView = () => {
           '01': 3,
           '11': 4,
         }
-        const newPage = running.pages.sort((a, b) => criteria[a.nur] - criteria[b.nur])[0];
-        running.pages[newPage.pageNumber].residence = 0;
+        newPage = running.pages.sort((a, b) => criteria[a.nur] - criteria[b.nur])[0];
       }
+      running.pages[newPage.pageNumber].residence = 0;
+      running.pages[newPage.pageNumber].entry = 0;
+      running.pages[newPage.pageNumber].count = 0;
+      running.pages[newPage.pageNumber].access = 0;
+      running.pages[newPage.pageNumber].lastAccess = 0;
+      running.pages[newPage.pageNumber].read = 0;
+      running.pages[newPage.pageNumber].write = 0
+      running.pages[newPage.pageNumber].nur = `${running.pages[page].read}${running.pages[page].write}`;
     }
-
-    running.pages[page].residence = 1;
+    if (running.pages[page].residence === 0) {
+      running.pages[page].residence = 1;
+      running.pages[page].entry = actualTime;
+    }
     running.pages[page].lastAccess = actualTime;
     running.pages[page].access = running.pages[page].access + 1;
     if (1 + running.pages[page].count === 5) {
       running.pages[page].count = 0;
       running.pages[page].read = 1;
-      running.pages[page].write= 1
+      running.pages[page].write = 1
       running.pages[page].nur = `${running.pages[page].read}${running.pages[page].write}`;
 
     } else {
