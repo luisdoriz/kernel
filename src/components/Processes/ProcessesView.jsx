@@ -31,8 +31,23 @@ const ProcessesView = () => {
           }
           const addProcess = (pageNumber, remainingCpu) => {
             const newProcesses = processes;
+            const pages = [];
+            for (let i = 0; i < pageNumber; ++i) {
+              pages.push({
+                pageNumber: i,
+                count: 0,
+                residence: 0,
+                entry: 0,
+                lastAccess: 0,
+                access: 0,
+                read: 0,
+                write: 0,
+                nur: `00`,
+              })
+            }
             const newProcess = {
               pageNumber,
+              pages,
               remainingCpu,
               name: processes[processes.length - 1].name + 1,
               entryTime: actualTime,

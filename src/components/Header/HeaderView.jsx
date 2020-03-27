@@ -26,14 +26,16 @@ const CpuView = () => {
     setBlockCounter,
   } = useContext(Context.Consumer)
   const [interruption, setInterruption] = useState(undefined)
+  const [pageNumberState, setPageNumber] = useState(0)
 
   const executeInstruction = (newProcesses) => {
     const running = newProcesses.filter(process => process.status === 1)[0];
     const nextRunning = sort[schedueling](newProcesses, actualTime)[0];
     if (blockCounter + 1 === 5) {
-      const blocked = newProcesses.filter(process => process.status === 2)[0];
+      const blocked = newProcesses.filter(process => process.status === 2);
       if (blocked.length > 0) {
         newProcesses[blocked[0].name - 1].status = 3;
+        newProcesses[blocked[0].name - 1].entryTimeReady = actualTime;
       }
       setBlockCounter(0)
     } else {
@@ -48,11 +50,13 @@ const CpuView = () => {
             newProcesses[nextRunning.name - 1].status = 1;
           }
           setQuantum(originalQuantum);
+          setPageNumber(0);
         } else {
           setQuantum(quantum - 1);
           newProcesses[running.name - 1].remainingCpu = running.remainingCpu - 1;
         }
         if (running.remainingCpu === 0) {
+          setPageNumber(0);
           newProcesses[running.name - 1].status = 4;
           if (nextRunning) {
             newProcesses[nextRunning.name - 1].status = 1;
@@ -60,6 +64,7 @@ const CpuView = () => {
           setQuantum(originalQuantum);
         }
       } else {
+        setPageNumber(0);
         newProcesses[running.name - 1].remainingCpu = running.remainingCpu - 1;
         if (running.remainingCpu === 0) {
           newProcesses[running.name - 1].status = 4;
@@ -67,6 +72,7 @@ const CpuView = () => {
             newProcesses[nextRunning.name - 1].status = 1;
           }
         }
+        setPageNumber(0);
       }
       setProcesses(newProcesses);
       setActualTime(actualTime + 1);
@@ -113,20 +119,25 @@ const CpuView = () => {
   const executePage = (page) => {
     const newProcesses = [...processes];
     const running = newProcesses.filter(process => process.status === 1)[0];
-    let activePages;
+    let activePages = 0;
     running.pages.forEach(element => {
       if (element.residence) {
-        ++activePages
+        activePages++;
       }
     });
-    if (pageNumber === activePages) {
+    if (running.pages[page].residence === 0) {
+      activePages++;
+    }
+    if (pageNumber < activePages) {
+      const pages = [...running.pages];
+      pages.splice(page, 1);
       let newPage;
       if (memoryAlgorithms.FIFO === memoryAlgorithm) {
-        newPage = running.pages.sort((a, b) => a.entry - b.entry)[0];
+        newPage = pages.sort((a, b) => a.entry - b.entry)[0];
       } else if (memoryAlgorithms.LRU === memoryAlgorithm) {
-        newPage = running.pages.sort((a, b) => a.lastAccess - b.lastAccess)[0];
+        newPage = pages.sort((a, b) => a.lastAccess - b.lastAccess)[0];
       } else if (memoryAlgorithms.LFU === memoryAlgorithm) {
-        newPage = running.pages.sort((a, b) => a.access - b.access)[0];
+        newPage = pages.sort((a, b) => a.access - b.access)[0];
       } else if (memoryAlgorithms.NUR === memoryAlgorithm) {
         const criteria = {
           '00': 1,
@@ -134,7 +145,7 @@ const CpuView = () => {
           '01': 3,
           '11': 4,
         }
-        newPage = running.pages.sort((a, b) => criteria[a.nur] - criteria[b.nur])[0];
+        newPage = pages.sort((a, b) => criteria[a.nur] - criteria[b.nur])[0];
       }
       running.pages[newPage.pageNumber].residence = 0;
       running.pages[newPage.pageNumber].entry = 0;
@@ -163,8 +174,7 @@ const CpuView = () => {
       running.pages[page].nur = `${running.pages[page].read}${running.pages[page].write}`;
     }
     newProcesses[running.name - 1] = running;
-    setProcesses(newProcesses);
-
+    executeInstruction(newProcesses);
   }
   return (
     <Row type="flex" style={{ marginTop: 20 }} justify="center" align="middle">
@@ -180,16 +190,21 @@ const CpuView = () => {
               <Col span={12}>
                 <Button
                   type="primary"
-                  // disabled={!processes.filter(process => process.status === 1).length}
-                  onClick={() => executeInstruction(processes)}
+                  onClick={() => executePage(pageNumberState)}
                 >
                   Ejecutar Instruccion
                           </Button>
               </Col>
               <Col span={12}>
+                {/* <Row>
+                  <h3>Pag:
+                  <InputNumber min={0} defaultValue={0} onChange={(e) => setPageNumber(e)} />
+                  </h3>
+                </Row> */}
                 <Select
                   style={{ width: '100%' }}
-                  onChange={(e) => executePage(e)}
+                  onChange={(e) => setPageNumber(e)}
+                  value={pageNumberState}
                   placeholder="Ejecutar pagina"
                 >
                   {processes.filter(process => process.status === 1)[0].pages.map((page) => (
