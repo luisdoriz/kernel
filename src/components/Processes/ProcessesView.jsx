@@ -54,6 +54,7 @@ const ProcessesView = () => {
               assignedCpu: 0,
               remainingQuantum: quantum,
               status: 3,
+              entryTimeReady: actualTime,
             };
             if (!processes.filter(process => process.status === 1).length) {
               newProcess.status = 1;
